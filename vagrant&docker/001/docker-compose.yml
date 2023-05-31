@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+     - './api/src:/src'
+    working_dir: /src
+    ports:
+     - "8000:8000"
+    command: sh -c "python3 manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    restart: always
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: api
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+    privileged: true
+    ports:
+      - "3333:3306"
+
+volumes:
+  mysql_data:
